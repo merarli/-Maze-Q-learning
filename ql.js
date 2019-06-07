@@ -2,12 +2,12 @@ console.log('JavaScriptでQlearningやってみる\n');
 console.log('2つの分かれ道がある');
 
 const NODE_NO = 15; //Q値のノード数
-const GEN_MAX = 20; //学習回数
+const GEN_MAX = 1000; //学習回数
 const ALPHA = 0.1; //学習係数
 const GAMMA = 0.9; //割引率
 const EPSILON = 0.3; //行動選択のランダム聖を決定(閾値)
 const REWORD_1 = 1000; //報酬1
-const REWORD_2 = 500; //報酬2
+const REWORD_2 = 5000; //報酬2
 const DEPTH = 3; //道のりの深さ
 
 log = ""; //経路選択のログを保存する
@@ -19,7 +19,6 @@ main();
 function main() {
  let q_val = [NODE_NO]; //Q値
  let status; //状態
- let time; //時間
 
  //Q値のノード数の数だけループ
  for (let i = 0; i < NODE_NO; i++) {
@@ -36,20 +35,35 @@ function main() {
   status = 0; //状態を初期化
 
   //道のりの深さ分だけループ
-  for (time = 0; time < DEPTH; time++) {
+  for (let t = 0; t < DEPTH; t++) {
 
-    console.log('\n【現在のQ値】\n' + q_val + '\n');
-    status = selecta(status, q_val);
-    console.log('経路が選択されました: ' + status);
-    log += status+',';
-    q_val[status] = upDateQ(status, q_val);
-    console.log('　―その経路のQ値: ' + q_val[status]);
+   //console.log('\n【現在のQ値】\n' + q_val + '\n');
+   status = selecta(status, q_val);
+   //console.log('経路が選択されました: ' + status);
+   log += status + '\t';
+   q_val[status] = upDateQ(status, q_val);
+   //console.log('　―その経路のQ値: ' + q_val[status]);
+
+
+   //結果をわかり易く表示(show_num回に１回結果を表示
+   let show_num = 10;
+   if(i%show_num == 0) {
+    let result = '';
+    for (let j = 1; j < NODE_NO; j++) {
+     result += 's'+j+': '+ q_val[j] + '\t';
+     //result += q_val[j] + '\t';
+    }
+    console.log(result);
+   }
+
+
   }
 
  }
  // saveLog();
 
- console.log('log\n'+log);
+
+ console.log('\nlog:\n' + log);
  saveLog();
 }
 
@@ -63,10 +77,11 @@ function upDateQ(old_status, q_val) {
 
  //現在の状態が6より大きかったら
  if (old_status > 6) {
-  //現在の状態が14なら報酬を付与
   if (old_status == 14) {
+   //現在の状態が14なら報酬を付与
    q_v = q_val[old_status] + ALPHA * (REWORD_1 - q_val[old_status]);
   } else if (old_status == 11) {
+   //現在の状態が11なら報酬を付与
    q_v = q_val[old_status] + ALPHA * (REWORD_2 - q_val[old_status]);
   }
  } else {
@@ -77,9 +92,9 @@ function upDateQ(old_status, q_val) {
 
   }
 
-  q_v = q_val[old_status] + ALPHA * (GAMMA * q_max - q_val[old_status]);
+  q_v = (q_val[old_status] + ALPHA * (GAMMA * q_max - q_val[old_status]));
  }
- return q_v
+ return parseInt(q_v);
 }
 
 
@@ -93,6 +108,7 @@ function selecta(old_status, q_val) {
  //発生した乱数(0.00~1.00)が閾値より小さかったら
  if (getRandByMinMax(0, 1) < EPSILON) {
 
+  //★★道は2通りしかないので、どちらかをランダムで決定する
   if (get01() == 0) {
    //0か1を発生させて、0だったら
    //現在の状態を2倍して、+1する
@@ -116,7 +132,7 @@ function selecta(old_status, q_val) {
   }
  }
 
- return status;
+ return parseInt(status);
 }
 
 
@@ -133,15 +149,12 @@ function get01() {
 }
 
 
-
 function saveLog() {
  var fs = require('fs');
- try{
-
-
+ try {
   fs.writeFileSync('log.txt', log);
- }catch (e) {
-
+ } catch (e) {
+  console.log('e: ' + e);
  }
 
 }
