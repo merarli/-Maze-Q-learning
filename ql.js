@@ -10,7 +10,7 @@ const REWORD_1 = 1000; //報酬1
 const REWORD_2 = 500; //報酬2
 const DEPTH = 3; //道のりの深さ
 
-log = "";
+log = ""; //経路選択のログを保存する
 console.log('道のりの深さは: ' + DEPTH);
 console.log('最終的なゴール数は: ' + Math.pow(2, DEPTH) + '\n');
 
@@ -44,13 +44,6 @@ function main() {
     log += status+',';
     q_val[status] = upDateQ(status, q_val);
     console.log('　―その経路のQ値: ' + q_val[status]);
-  }
-
-  // なんの処理？？？
-  if (i % 20 == 0) {
-   for (let j = 0; j < NODE_NO; j++) {
-    console.log('j: ' + j);
-   }
   }
 
  }
