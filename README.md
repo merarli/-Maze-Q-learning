@@ -6,3 +6,6 @@
  - ログファイルを書き出すためにfsモジュールを使う
  
  ``$ npm install fs``
+
+>https://qiita.com/fujina/items/f407a1ca143e0bbc4446
+>>参考にしたサイト
