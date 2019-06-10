@@ -1,15 +1,16 @@
 console.log('JavaScriptでQlearningやってみる\n');
 
 
-const NODE_NO = 15; //Q値のノード数
-const GEN_MAX = 300; //学習回数
+const NODE_NO = 31; //Q値のノード数
+const GEN_MAX = 500; //学習回数
 const ALPHA = 0.1; //学習係数
 const GAMMA = 0.9; //割引率
 const EPSILON = 0.3; //行動選択のランダム性を決定(閾値)
 const REWORD_1 = 100; //報酬1
 const REWORD_2 = 500; //報酬2
 const REWORD_3 = 10; //報酬3
-const DEPTH = 3; //道のりの深さ
+const REWORD_4 = 300; //報酬4
+const DEPTH = 4; //道のりの深さ
 
 log = ""; //経路選択のログを保存する
 console.log('2つの分かれ道が'+DEPTH+'連続で続いている道がある');
@@ -25,7 +26,7 @@ function main() {
  for (let i = 0; i < NODE_NO; i++) {
   // 0~100の乱数を発生させて
   // q_valに代入
-  q_val[i] = parseInt(getRandByMinMax(0, 500));
+  q_val[i] = parseInt(getRandByMinMax(0, 200));
  }
  console.log('\n【初期値のQ値】\n' + q_val + '\n');
 
@@ -47,7 +48,7 @@ function main() {
 
 
    //結果をわかり易く表示(show_num回に１回結果を表示
-   let show_num = 10;
+   let show_num = 50;
    if(i%show_num == 0) {
     let result = '';
     for (let j = 1; j < NODE_NO; j++) {
@@ -61,7 +62,7 @@ function main() {
 
  }
 
- console.log('\nlog:\n' + log);
+ //console.log('\nlog:\n' + log);
  saveLog();
 }
 
@@ -81,10 +82,18 @@ function upDateQ(old_status, q_val) {
   } else if (old_status == 11) {
    //現在の状態が11なら報酬を付与
    q_v = q_val[old_status] + ALPHA * (REWORD_2 - q_val[old_status]);
+
+   //現在の状態が30なら報酬を付与
+  }else if(old_status == 30){
+   q_v = q_val[old_status] + ALPHA * (REWORD_4 - q_val[old_status]);
   }
+
+
  } else {
   //現在の状態が2なら報酬を付与
-  q_v = q_val[old_status] + ALPHA * (REWORD_3 - q_val[old_status]);
+  if (old_status == 2) {
+   q_v = q_val[old_status] + ALPHA * (REWORD_3 - q_val[old_status]);
+  }
 
   //現在の状態から見た次の経路を比較して、Q値が大きい方をq_maxに代入する
   if (q_val[2 * old_status + 1] > q_val[2 * old_status + 2]) {
@@ -98,6 +107,9 @@ function upDateQ(old_status, q_val) {
   //そこから、現在のq値を引く
   //そこに、現在のQ値に学習係数を足す
   q_v = (q_val[old_status] + ALPHA * (GAMMA * q_max - q_val[old_status]));
+ }
+ if(isNaN(q_v)){
+  return 0
  }
  return parseInt(q_v);
 }
